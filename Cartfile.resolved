@@ -1,0 +1,5 @@
+github "ikesyo/Himotoki" "1.5.0"
+github "antitypical/Result" "1.0.2"
+github "ReactiveX/RxSwift" "2.2.0"
+github "kylef/WebLinking.swift" "1.0.0"
+github "ishkawa/APIKit" "1.1.4"
