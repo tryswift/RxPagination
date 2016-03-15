@@ -5,5 +5,7 @@ struct PaginationResponse<E: Decodable where E.DecodedType == E>: PaginationResp
     typealias Element = E
 
     let elements: [Element]
-    let hasNextPage: Bool
+
+    let previousPage: Int?
+    let nextPage: Int?
 }

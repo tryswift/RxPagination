@@ -8,7 +8,7 @@ class PaginationViewModel<Request: PaginationRequestType> {
 
     init(baseRequest: Request) {
         self.baseRequest = baseRequest
-        self.bindBaseRequest(baseRequest, previousRequest: nil)
+        self.bindBaseRequest(baseRequest, nextPage: nil)
     }
 
     let refreshTrigger = PublishSubject<Void>()
@@ -20,28 +20,22 @@ class PaginationViewModel<Request: PaginationRequestType> {
 
     private var disposeBag = DisposeBag()
 
-    private func bindBaseRequest(baseRequest: Request, previousRequest: Request?) {
+    private func bindBaseRequest(baseRequest: Request, nextPage: Int?) {
         disposeBag = DisposeBag()
 
-        let refreshRequest = [
-                Observable.never().takeUntil(refreshTrigger),
-                Observable.of(baseRequest.requestWithPage(1))
-            ]
-            .concat()
-            .shareReplay(1)
+        let refreshRequest = refreshTrigger
+            .take(1)
+            .map { baseRequest.requestWithPage(1) }
 
-        let nextPageRequest: Observable<Request>
-
-        if let previousPage = previousRequest?.page {
-            nextPageRequest = [
-                    Observable.never().takeUntil(loadNextPageTrigger),
-                    Observable.of(baseRequest.requestWithPage(previousPage + 1))
-                ]
-                .concat()
-                .shareReplay(1)
-        } else {
-            nextPageRequest = Observable.never()
-        }
+        let nextPageRequest = loadNextPageTrigger
+            .take(1)
+            .flatMap { () -> Observable<Request> in
+                if let page = nextPage {
+                    return Observable.of(baseRequest.requestWithPage(page))
+                } else {
+                    return Observable.empty()
+                }
+            }
 
         let request = Observable
             .of(refreshRequest, nextPageRequest)
@@ -49,23 +43,27 @@ class PaginationViewModel<Request: PaginationRequestType> {
             .take(1)
             .shareReplay(1)
 
-        let requestResponse = request
-            .flatMap { request in
-                return Session
-                    .rx_response(request)
-                    .map { (request, $0) }
-            }
+        let response = request
+            .flatMap { Session.rx_response($0) }
             .shareReplay(1)
-
-        let response = requestResponse.map { $0.1 }
 
         Observable
             .of(
-                Observable.of(true).sample(request),
-                Observable.of(false).sample(requestResponse)
+                request.map { _ in true },
+                response.map { _ in false }
             )
             .merge()
             .bindTo(loading)
+            .addDisposableTo(disposeBag)
+
+        Observable
+            .combineLatest(elements.asObservable(), response) { elements, response in
+                return response.hasPreviousPage
+                    ? elements + response.elements
+                    : response.elements
+            }
+            .take(1)
+            .bindTo(elements)
             .addDisposableTo(disposeBag)
 
         response
@@ -73,15 +71,9 @@ class PaginationViewModel<Request: PaginationRequestType> {
             .bindTo(hasNextPage)
             .addDisposableTo(disposeBag)
 
-        requestResponse
-            .subscribeNext { [weak self] request, response in
-                if request.page == 1 {
-                    self?.elements.value = response.elements
-                } else {
-                    self?.elements.value += response.elements
-                }
-
-                self?.bindBaseRequest(baseRequest, previousRequest: request)
+        response
+            .subscribeNext { [weak self] response in
+                self?.bindBaseRequest(baseRequest, nextPage: response.nextPage)
             }
             .addDisposableTo(disposeBag)
     }
