@@ -13,14 +13,14 @@ extension GitHubRequestType {
     }
 }
 
-extension GitHubRequestType where Response: Decodable, Response.DecodedType == Response {
-    func responseFromObject(object: AnyObject, URLResponse: NSHTTPURLResponse) -> Response? {
-        return try? decode(object)
+extension GitHubRequestType where Response: Decodable {
+    func responseFromObject(object: AnyObject, URLResponse: NSHTTPURLResponse) throws -> Response {
+        return try decodeValue(object)
     }
 }
 
-extension GitHubRequestType where Response: PaginationResponseType, Response.Element.DecodedType == Response.Element {
-    func responseFromObject(object: AnyObject, URLResponse: NSHTTPURLResponse) -> Response? {
+extension GitHubRequestType where Response: PaginationResponseType {
+    func responseFromObject(object: AnyObject, URLResponse: NSHTTPURLResponse) throws -> Response {
         var previousPage: Int?
         if let previousURI = URLResponse.findLink(relation: "prev")?.uri,
            let queryItems = NSURLComponents(string: previousURI)?.queryItems {
@@ -41,8 +41,8 @@ extension GitHubRequestType where Response: PaginationResponseType, Response.Ele
                 .flatMap { Int($0) }
         }
 
-        let elements = try? decodeArray(object, rootKeyPath: "items") as [Response.Element]
+        let elements = try decodeArray(object, rootKeyPath: "items") as [Response.Element]
 
-        return elements.map { Response(elements: $0, previousPage: previousPage, nextPage: nextPage) }
+        return Response(elements: elements, previousPage: previousPage, nextPage: nextPage)
     }
 }

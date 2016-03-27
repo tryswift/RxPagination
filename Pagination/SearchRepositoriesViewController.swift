@@ -11,7 +11,7 @@ class SearchRepositoriesViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        rx_sentMessage("viewWillAppear:")
+        rx_sentMessage(#selector(UIViewController.viewWillAppear(_:)))
             .map { _ in () }
             .bindTo(viewModel.refreshTrigger)
             .addDisposableTo(disposeBag)

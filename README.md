@@ -9,6 +9,11 @@ This is the demo project for my presentation at try! Swift conference 2016.
 
 - `carthage bootstrap --platform iOS`
 
+## Requirements
+
+- Swift 2.2
+- Xcode 7.3
+
 ## Summary
 
 When you give a type parameter `Request` to `PaginationViewModel<Request: PaginationRequestType>`, you can get typed response stream `Observable<[Request.Response.Element]>`.

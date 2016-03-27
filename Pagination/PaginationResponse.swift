@@ -1,7 +1,7 @@
 import Foundation
 import Himotoki
 
-struct PaginationResponse<E: Decodable where E.DecodedType == E>: PaginationResponseType {
+struct PaginationResponse<E: Decodable>: PaginationResponseType {
     typealias Element = E
 
     let elements: [Element]

@@ -2,7 +2,7 @@ import Foundation
 import APIKit
 
 protocol PaginationRequestType: RequestType {
-    typealias Response: PaginationResponseType
+    associatedtype Response: PaginationResponseType
 
     var page: Int { get }
 

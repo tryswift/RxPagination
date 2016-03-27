@@ -22,7 +22,7 @@ extension GitHubAPI {
             return "/search/repositories"
         }
 
-        var parameters: [String: AnyObject] {
+        var parameters: AnyObject? {
             return ["q": query, "page": page]
         }
 

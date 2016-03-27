@@ -2,7 +2,7 @@ import Foundation
 import Himotoki
 
 protocol PaginationResponseType {
-    typealias Element: Decodable
+    associatedtype Element: Decodable
 
     var elements: [Element] { get }
 
