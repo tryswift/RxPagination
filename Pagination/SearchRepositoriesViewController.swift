@@ -5,8 +5,8 @@ class SearchRepositoriesViewController: UITableViewController {
     @IBOutlet weak var indicatorView: UIActivityIndicatorView!
 
     let disposeBag = DisposeBag()
-    let viewModel = PaginationViewModel(
-        baseRequest: GitHubAPI.SearchRepositoriesRequest(query: "Swift"))
+    let viewModel = PaginationViewModel(baseRequest:
+        GitHubAPI.SearchRepositoriesRequest(query: "Swift"))
 
     override func viewDidLoad() {
         super.viewDidLoad()

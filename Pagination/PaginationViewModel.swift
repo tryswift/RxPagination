@@ -4,34 +4,33 @@ import RxCocoa
 import APIKit
 
 class PaginationViewModel<Request: PaginationRequestType> {
-    let baseRequest: Request
-
-    init(baseRequest: Request) {
-        self.baseRequest = baseRequest
-        self.bindBaseRequest(baseRequest, nextPage: nil)
-    }
-
     let refreshTrigger = PublishSubject<Void>()
     let loadNextPageTrigger = PublishSubject<Void>()
 
     let hasNextPage = Variable<Bool>(false)
     let loading = Variable<Bool>(false)
     let elements = Variable<[Request.Response.Element]>([])
+    let lastLoadedPage = Variable<Int?>(nil)
 
-    private var disposeBag = DisposeBag()
+    let error = PublishSubject<ErrorType>()
 
-    private func bindBaseRequest(baseRequest: Request, nextPage: Int?) {
-        disposeBag = DisposeBag()
+    private let disposeBag = DisposeBag()
 
+    init(baseRequest: Request) {
         let refreshRequest = refreshTrigger
-            .take(1)
-            .map { baseRequest.requestWithPage(1) }
+            .withLatestFrom(loading.asObservable())
+            .filter { !$0 }
+            .map { _ in baseRequest.requestWithPage(1) }
 
         let nextPageRequest = loadNextPageTrigger
-            .take(1)
-            .flatMap { () -> Observable<Request> in
-                if let page = nextPage {
-                    return Observable.of(baseRequest.requestWithPage(page))
+            .withLatestFrom(loading.asObservable())
+            .filter { !$0 }
+            .withLatestFrom(hasNextPage.asObservable())
+            .filter { $0 }
+            .withLatestFrom(lastLoadedPage.asObservable())
+            .flatMap { lastLoadedPage -> Observable<Request> in
+                if let page = lastLoadedPage {
+                    return Observable.of(baseRequest.requestWithPage(page + 1))
                 } else {
                     return Observable.empty()
                 }
@@ -40,41 +39,47 @@ class PaginationViewModel<Request: PaginationRequestType> {
         let request = Observable
             .of(refreshRequest, nextPageRequest)
             .merge()
-            .take(1)
             .shareReplay(1)
 
         let response = request
-            .flatMap { Session.rx_response($0) }
+            .flatMap { request in
+                return Session
+                    .rx_response(request)
+                    .doOnError { [weak self] error in
+                        self?.error.onNext(error)
+                    }
+                    .catchError { _ in Observable.empty() }
+            }
             .shareReplay(1)
 
         Observable
             .of(
                 request.map { _ in true },
-                response.map { _ in false }
+                response.map { _ in false },
+                error.map { _ in false }
             )
             .merge()
             .bindTo(loading)
             .addDisposableTo(disposeBag)
 
-        Observable
-            .combineLatest(elements.asObservable(), response) { elements, response in
-                return response.hasPreviousPage
-                    ? elements + response.elements
-                    : response.elements
+        response
+            .withLatestFrom(request) { $0 }
+            .withLatestFrom(elements.asObservable()) { requestResponse, elements in
+                let request = requestResponse.1
+                let response = requestResponse.0
+                return request.page == 1 ? response.elements : elements + response.elements
             }
-            .take(1)
             .bindTo(elements)
+            .addDisposableTo(disposeBag)
+
+        response
+            .withLatestFrom(request) { $1.page }
+            .bindTo(lastLoadedPage)
             .addDisposableTo(disposeBag)
 
         response
             .map { $0.hasNextPage }
             .bindTo(hasNextPage)
-            .addDisposableTo(disposeBag)
-
-        response
-            .subscribeNext { [weak self] response in
-                self?.bindBaseRequest(baseRequest, nextPage: response.nextPage)
-            }
             .addDisposableTo(disposeBag)
     }
 }
