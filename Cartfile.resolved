@@ -1,5 +1,5 @@
-github "ikesyo/Himotoki" "2.0.0-beta.2"
+github "ikesyo/Himotoki" "2.0.1"
 github "antitypical/Result" "2.0.0"
 github "ReactiveX/RxSwift" "2.3.1"
 github "kylef/WebLinking.swift" "1.0.0"
-github "ishkawa/APIKit" "2.0.0-beta.3"
+github "ishkawa/APIKit" "2.0.0-beta.4"

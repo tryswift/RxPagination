@@ -4,6 +4,8 @@ import RxCocoa
 import APIKit
 
 class PaginationViewModel<Request: PaginationRequestType> {
+    let session: Session
+
     let refreshTrigger = PublishSubject<Void>()
     let loadNextPageTrigger = PublishSubject<Void>()
 
@@ -16,7 +18,9 @@ class PaginationViewModel<Request: PaginationRequestType> {
 
     private let disposeBag = DisposeBag()
 
-    init(baseRequest: Request) {
+    init(baseRequest: Request, session: Session = Session.sharedSession) {
+        self.session = session
+
         let refreshRequest = refreshTrigger
             .withLatestFrom(loading.asObservable())
             .filter { !$0 }
@@ -43,7 +47,7 @@ class PaginationViewModel<Request: PaginationRequestType> {
 
         let response = request
             .flatMap { request in
-                return Session
+                return session
                     .rx_response(request)
                     .doOnError { [weak self] error in
                         self?.error.onNext(error)

@@ -3,9 +3,13 @@ import RxSwift
 import APIKit
 
 extension Session {
-    static func rx_response<T: RequestType>(request: T) -> Observable<T.Response> {
-        return Observable.create { observer in
-            let task = sendRequest(request) { result in
+    class func rx_response<T: RequestType>(request: T) -> Observable<T.Response> {
+        return Session.rx_response(request)
+    }
+
+    func rx_response<T: RequestType>(request: T) -> Observable<T.Response> {
+        return Observable.create { [weak self] observer in
+            let task = self?.sendRequest(request) { result in
                 switch result {
                 case .Success(let response):
                     observer.on(.Next(response))
