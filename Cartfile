@@ -1,4 +1,4 @@
-github "ishkawa/APIKit" "2.0.0-beta.3"
-github "ikesyo/Himotoki" "2.0.0-beta.2"
+github "ishkawa/APIKit"  ~> 2.0.0
+github "ikesyo/Himotoki" ~> 2.0.0
 github "ReactiveX/RxSwift" ~> 2.3.1
 github "kylef/WebLinking.swift" ~> 1.0.0
