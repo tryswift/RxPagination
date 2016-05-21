@@ -21,19 +21,21 @@ class PaginationViewModel<Request: PaginationRequestType> {
     init(baseRequest: Request, session: Session = Session.sharedSession) {
         self.session = session
 
-        let refreshRequest = refreshTrigger
-            .withLatestFrom(loading.asObservable())
-            .filter { !$0 }
-            .map { _ in baseRequest.requestWithPage(1) }
+        let refreshRequest = loading.asObservable()
+            .sample(refreshTrigger)
+            .flatMap { loading -> Observable<Request> in
+                if loading {
+                    return Observable.empty()
+                } else {
+                    return Observable.of(baseRequest.requestWithPage(1))
+                }
+            }
 
-        let nextPageRequest = loadNextPageTrigger
-            .withLatestFrom(loading.asObservable())
-            .filter { !$0 }
-            .withLatestFrom(hasNextPage.asObservable())
-            .filter { $0 }
-            .withLatestFrom(lastLoadedPage.asObservable())
-            .flatMap { lastLoadedPage -> Observable<Request> in
-                if let page = lastLoadedPage {
+        let nextPageRequest = Observable
+            .combineLatest(loading.asObservable(), hasNextPage.asObservable(), lastLoadedPage.asObservable()) { $0 }
+            .sample(loadNextPageTrigger)
+            .flatMap { loading, hasNextPage, lastLoadedPage -> Observable<Request> in
+                if let page = lastLoadedPage where !loading && hasNextPage {
                     return Observable.of(baseRequest.requestWithPage(page + 1))
                 } else {
                     return Observable.empty()
@@ -46,7 +48,7 @@ class PaginationViewModel<Request: PaginationRequestType> {
             .shareReplay(1)
 
         let response = request
-            .flatMap { request in
+            .flatMap { [weak self] request in
                 return session
                     .rx_response(request)
                     .doOnError { [weak self] error in
@@ -66,13 +68,11 @@ class PaginationViewModel<Request: PaginationRequestType> {
             .bindTo(loading)
             .addDisposableTo(disposeBag)
 
-        response
-            .withLatestFrom(request) { $0 }
-            .withLatestFrom(elements.asObservable()) { requestResponse, elements in
-                let request = requestResponse.1
-                let response = requestResponse.0
+        Observable
+            .combineLatest(request, response, elements.asObservable()) { request, response, elements in
                 return request.page == 1 ? response.elements : elements + response.elements
             }
+            .sample(response)
             .bindTo(elements)
             .addDisposableTo(disposeBag)
 
