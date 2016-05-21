@@ -26,6 +26,22 @@ class PaginationViewModelTests: XCTestCase {
         viewModel = PaginationViewModel(baseRequest: request, session: session)
     }
 
+    func testAAA() {
+        let scheduler = TestScheduler(initialClock: 0)
+        let observer = scheduler.createObserver(String)
+
+        scheduler.scheduleAt(100) { observer.onNext("abc") }
+        scheduler.scheduleAt(150) { observer.onNext("def") }
+        scheduler.scheduleAt(200) { observer.onNext("ghi") }
+        scheduler.start()
+
+        XCTAssertEqual(observer.events, [
+            next(100, "abc"),
+            next(150, "def"),
+            next(200, "ghi"),
+        ])
+    }
+
     func test() {
         let loading = scheduler.createObserver(Bool)
         viewModel.loading.asDriver()

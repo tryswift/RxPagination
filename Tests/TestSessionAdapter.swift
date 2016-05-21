@@ -9,6 +9,10 @@ class TestSessionAdapter: SessionAdapterType {
             self.handler = handler
         }
 
+        func resume() {
+
+        }
+
         func cancel() {
 
         }
@@ -26,7 +30,7 @@ class TestSessionAdapter: SessionAdapterType {
     }
 
     // MARK: SessionAdapterType
-    func resumedTaskWithURLRequest(URLRequest: NSURLRequest, handler: (NSData?, NSURLResponse?, NSError?) -> Void) -> SessionTaskType {
+    func createTaskWithURLRequest(URLRequest: NSURLRequest, handler: (NSData?, NSURLResponse?, ErrorType?) -> Void) -> SessionTaskType {
         let task = Task(handler: handler)
         tasks.append(task)
 

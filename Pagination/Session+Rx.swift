@@ -4,7 +4,7 @@ import APIKit
 
 extension Session {
     class func rx_response<T: RequestType>(request: T) -> Observable<T.Response> {
-        return Session.rx_response(request)
+        return sharedSession.rx_response(request)
     }
 
     func rx_response<T: RequestType>(request: T) -> Observable<T.Response> {
