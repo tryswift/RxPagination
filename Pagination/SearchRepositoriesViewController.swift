@@ -30,5 +30,17 @@ class SearchRepositoriesViewController: UITableViewController {
                 cell.detailTextLabel?.text = "🌟\(repository.stargazersCount)"
             }
             .addDisposableTo(disposeBag)
+
+        if let refreshControl = refreshControl {
+            refreshControl.rx_controlEvent(.ValueChanged)
+                .map { _ in }
+                .bindTo(viewModel.refreshTrigger)
+                .addDisposableTo(disposeBag)
+
+            viewModel.loading
+                .filter { !$0 }
+                .bindTo(refreshControl.rx_refreshing)
+                .addDisposableTo(disposeBag)
+        }
     }
 }
