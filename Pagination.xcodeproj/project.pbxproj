@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7F066D9C1D2EB05200F432B1 /* Action.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F066D9B1D2EB04800F432B1 /* Action.framework */; };
+		7F066D9D1D2EB05700F432B1 /* Action.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7F066D9B1D2EB04800F432B1 /* Action.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7F066D9E1D2EB06800F432B1 /* Action.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F066D9B1D2EB04800F432B1 /* Action.framework */; };
+		7F066D9F1D2EB06800F432B1 /* Action.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7F066D9B1D2EB04800F432B1 /* Action.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7F066DA01D2EB07F00F432B1 /* RxBlocking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FE41B9A1C868C8800E6E7EC /* RxBlocking.framework */; };
+		7F066DA11D2EB07F00F432B1 /* RxBlocking.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7FE41B9A1C868C8800E6E7EC /* RxBlocking.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7F9B84031C8688F40076C46A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F9B84021C8688F40076C46A /* AppDelegate.swift */; };
 		7F9B84081C8688F40076C46A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7F9B84061C8688F40076C46A /* Main.storyboard */; };
 		7F9B840A1C8688F40076C46A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7F9B84091C8688F40076C46A /* Assets.xcassets */; };
@@ -81,6 +87,7 @@
 				7FBBA9CE1CBF2713002C9B27 /* RxCocoa.framework in CopyFiles */,
 				7FBBA9CF1CBF2713002C9B27 /* RxSwift.framework in CopyFiles */,
 				7FBBA9D01CBF2713002C9B27 /* RxTests.framework in CopyFiles */,
+				7F066D9D1D2EB05700F432B1 /* Action.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,6 +99,8 @@
 			files = (
 				7FE423101C868CCD00E6E7EC /* RxSwift.framework in Embed Frameworks */,
 				7FE4230E1C868CCD00E6E7EC /* RxCocoa.framework in Embed Frameworks */,
+				7F066D9F1D2EB06800F432B1 /* Action.framework in Embed Frameworks */,
+				7F066DA11D2EB07F00F432B1 /* RxBlocking.framework in Embed Frameworks */,
 				7FE4230C1C868CCD00E6E7EC /* Result.framework in Embed Frameworks */,
 				7FE4230A1C868CCD00E6E7EC /* Himotoki.framework in Embed Frameworks */,
 				7FE4232B1C86D4C600E6E7EC /* WebLinking.framework in Embed Frameworks */,
@@ -103,6 +112,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7F066D9B1D2EB04800F432B1 /* Action.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Action.framework; sourceTree = "<group>"; };
 		7F9B83FF1C8688F40076C46A /* Pagination.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pagination.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F9B84021C8688F40076C46A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7F9B84071C8688F40076C46A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -143,6 +153,8 @@
 			files = (
 				7FE4230F1C868CCD00E6E7EC /* RxSwift.framework in Frameworks */,
 				7FE4230D1C868CCD00E6E7EC /* RxCocoa.framework in Frameworks */,
+				7F066D9E1D2EB06800F432B1 /* Action.framework in Frameworks */,
+				7F066DA01D2EB07F00F432B1 /* RxBlocking.framework in Frameworks */,
 				7FE4230B1C868CCD00E6E7EC /* Result.framework in Frameworks */,
 				7FE423091C868CCD00E6E7EC /* Himotoki.framework in Frameworks */,
 				7FE4232A1C86D4C600E6E7EC /* WebLinking.framework in Frameworks */,
@@ -154,6 +166,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7F066D9C1D2EB05200F432B1 /* Action.framework in Frameworks */,
 				7FBBA9C01CBF270A002C9B27 /* WebLinking.framework in Frameworks */,
 				7FBBA9C11CBF270A002C9B27 /* APIKit.framework in Frameworks */,
 				7FBBA9C21CBF270A002C9B27 /* Himotoki.framework in Frameworks */,
@@ -245,6 +258,7 @@
 		7FE41B851C868C8800E6E7EC /* iOS */ = {
 			isa = PBXGroup;
 			children = (
+				7F066D9B1D2EB04800F432B1 /* Action.framework */,
 				7FE423281C86D4AF00E6E7EC /* WebLinking.framework */,
 				7FE41B8E1C868C8800E6E7EC /* APIKit.framework */,
 				7FE41B961C868C8800E6E7EC /* Himotoki.framework */,
