@@ -10,6 +10,8 @@ class SearchRepositoriesViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.delegate = nil
+        tableView.dataSource = nil
 
         rx_sentMessage(#selector(UIViewController.viewWillAppear(_:)))
             .map { _ in () }
