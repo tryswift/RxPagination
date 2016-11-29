@@ -11,24 +11,28 @@ class SearchRepositoriesViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        rx_sentMessage(#selector(UIViewController.viewWillAppear(_:)))
-            .map { _ in () }
+        rx.sentMessage(#selector(viewWillAppear))
+            .map { _ in }
             .bindTo(viewModel.refreshTrigger)
             .addDisposableTo(disposeBag)
 
-        tableView.rx_reachedBottom
+        tableView.rx.reachedBottom
             .bindTo(viewModel.loadNextPageTrigger)
             .addDisposableTo(disposeBag)
 
-        viewModel.loading.asDriver()
-            .drive(indicatorView.rx_animating)
+        viewModel.loading
+            .bindTo(indicatorView.rx.isAnimating)
             .addDisposableTo(disposeBag)
 
-        viewModel.elements.asDriver()
-            .drive(tableView.rx_itemsWithCellIdentifier("Cell")) { _, repository, cell in
+        viewModel.elements
+            .bindTo(tableView.rx.items(cellIdentifier: "Cell")) { _, repository, cell in
                 cell.textLabel?.text = repository.fullName
                 cell.detailTextLabel?.text = "🌟\(repository.stargazersCount)"
             }
+            .addDisposableTo(disposeBag)
+
+        viewModel.error
+            .subscribe { print($0) }
             .addDisposableTo(disposeBag)
     }
 }

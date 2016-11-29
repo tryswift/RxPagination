@@ -6,7 +6,7 @@ struct Repository: Decodable {
     let fullName: String
     let stargazersCount: Int
 
-    static func decode(e: Extractor) throws -> Repository {
+    static func decode(_ e: Extractor) throws -> Repository {
         return try Repository(
             id:              e <| "id",
             fullName:        e <| "full_name",

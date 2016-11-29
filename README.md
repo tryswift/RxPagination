@@ -11,52 +11,19 @@ This is the demo project for my presentation at try! Swift conference 2016.
 
 ## Requirements
 
-- Swift 2.2
-- Xcode 7.3
+- Swift 3.0.1
+- Xcode 8.1
 
 ## Summary
 
-When you give a type parameter `Request` to `PaginationViewModel<Request: PaginationRequestType>`, you can get typed response stream `Observable<[Request.Response.Element]>`.
+`PaginationViewModel<Element>` is a view model for pagination. It has an initializer with type parameter `Request` which is constrained to conform to `PaginationRequest` protocol. When `PaginationViewModel<Element>` is instantiate via `init<Request>(baseRequest:)`, the type of its property that represents pagination elements will be inferred as `Observable<[Request.Response.Element]>`.
 
 ```swift
-import UIKit
-import RxSwift
+final class PaginationViewModel<Element: Decodable> {
+    let loading: Observable<Bool>
+    let elements: Observable<[Element]>
 
-class SearchRepositoriesViewController: UITableViewController {
-    @IBOutlet weak var indicatorView: UIActivityIndicatorView!
-
-    let disposeBag = DisposeBag()
-
-    // PaginationViewModel<GitHubAPI.SearchRepositoriesRequest>
-    let viewModel = PaginationViewModel(
-        baseRequest: GitHubAPI.SearchRepositoriesRequest(query: "Swift"))
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        rx_sentMessage("viewWillAppear:")
-            .map { _ in () }
-            .bindTo(viewModel.refreshTrigger)
-            .addDisposableTo(disposeBag)
-
-        tableView.rx_reachedBottom
-            .bindTo(viewModel.loadNextPageTrigger)
-            .addDisposableTo(disposeBag)
-
-        // viewModel.loading: Variable<Bool>
-        viewModel.loading.asDriver()
-            .drive(indicatorView.rx_animating)
-            .addDisposableTo(disposeBag)
-
-        // viewModel.elements: Variable<[Request.Response.Element]>
-        viewModel.elements.asDriver()
-            .drive(tableView.rx_itemsWithCellIdentifier("Cell")) { _, repository, cell in
-                // repository: Repository (= Request.Response.Element)
-                cell.textLabel?.text = repository.fullName
-                cell.detailTextLabel?.text = "🌟\(repository.stargazersCount)"
-            }
-            .addDisposableTo(disposeBag)
-    }
+    init<Request: PaginationRequest>(baseRequest: Request) where Request.Response.Element == Element {...}
 }
 ```
 

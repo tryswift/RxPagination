@@ -1,11 +1,11 @@
 import UIKit
 import RxSwift
 
-extension UIScrollView {
-    var rx_reachedBottom: Observable<Void> {
-        return rx_contentOffset
-            .flatMap { [weak self] contentOffset -> Observable<Void> in
-                guard let scrollView = self else {
+extension Reactive where Base: UIScrollView {
+    var reachedBottom: Observable<Void> {
+        return contentOffset
+            .flatMap { [weak base] contentOffset -> Observable<Void> in
+                guard let scrollView = base else {
                     return Observable.empty()
                 }
 

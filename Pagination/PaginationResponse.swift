@@ -1,11 +1,7 @@
 import Foundation
 import Himotoki
 
-struct PaginationResponse<E: Decodable>: PaginationResponseType {
-    typealias Element = E
-
+struct SearchResponse<Element: Decodable>: PaginationResponse {
     let elements: [Element]
-
-    let previousPage: Int?
     let nextPage: Int?
 }

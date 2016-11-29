@@ -1,43 +1,43 @@
 import Foundation
 import APIKit
 
-class TestSessionAdapter: SessionAdapterType {
-    class Task: SessionTaskType {
-        let handler: (NSData?, NSURLResponse?, NSError?) -> Void
+class TestSessionAdapter: SessionAdapter {
+    class Task: SessionTask {
+        let handler: (Data?, URLResponse?, Error?) -> Void
 
-        init(handler: (NSData?, NSURLResponse?, NSError?) -> Void) {
+        init(handler: @escaping (Data?, URLResponse?, Error?) -> Void) {
             self.handler = handler
         }
 
-        func resume() {
-
-        }
-
-        func cancel() {
-
-        }
+        func resume() {}
+        func cancel() {}
     }
 
     var tasks = [Task]()
 
-    func returnData(data: NSData? = NSData(), URLResponse: NSURLResponse? = NSHTTPURLResponse(URL: NSURL(), statusCode: 200, HTTPVersion: nil, headerFields: nil), error: NSError? = nil) {
+    func `return`(data: Data) {
         guard !tasks.isEmpty else {
             return
         }
 
         let task = tasks.removeFirst()
-        task.handler(data, URLResponse, error)
+        let urlResponse = HTTPURLResponse(
+            url: URL(string: "https://example.com")!,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: nil)
+
+        task.handler(data, urlResponse, nil)
     }
 
     // MARK: SessionAdapterType
-    func createTaskWithURLRequest(URLRequest: NSURLRequest, handler: (NSData?, NSURLResponse?, ErrorType?) -> Void) -> SessionTaskType {
+    func createTask(with URLRequest: URLRequest, handler: @escaping (Data?, URLResponse?, Error?) -> Void) -> SessionTask {
         let task = Task(handler: handler)
         tasks.append(task)
-
         return task
     }
 
-    func getTasksWithHandler(handler: [SessionTaskType] -> Void) {
+    func getTasks(with handler: @escaping ([SessionTask]) -> Void) {
         handler([])
     }
 }

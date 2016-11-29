@@ -1,89 +1,63 @@
 import Foundation
 import RxSwift
-import RxCocoa
 import APIKit
+import Action
+import Himotoki
 
-class PaginationViewModel<Request: PaginationRequestType> {
-    let session: Session
+private struct Pagination<Element: Decodable> {
+    let page: Int
+    let nextPage: Int?
+    let elements: [Element]
+}
 
+final class PaginationViewModel<Element: Decodable> {
     let refreshTrigger = PublishSubject<Void>()
     let loadNextPageTrigger = PublishSubject<Void>()
 
-    let hasNextPage = Variable<Bool>(false)
-    let loading = Variable<Bool>(false)
-    let elements = Variable<[Request.Response.Element]>([])
-    let lastLoadedPage = Variable<Int?>(nil)
+    let loading: Observable<Bool>
+    let elements: Observable<[Element]>
+    let error: Observable<Error>
 
-    let error = PublishSubject<ErrorType>()
-
+    private let action: Action<Int, Pagination<Element>>
     private let disposeBag = DisposeBag()
 
-    init(baseRequest: Request, session: Session = Session.sharedSession) {
-        self.session = session
+    init<Request: PaginationRequest>(baseRequest: Request, session: Session = Session.shared) where Request.Response.Element == Element {
+        action = Action { page in
+            var request = baseRequest
+            request.page = page
 
-        let refreshRequest = loading.asObservable()
-            .sample(refreshTrigger)
-            .flatMap { loading -> Observable<Request> in
-                if loading {
+            return session.rx.response(request)
+                .map { (request.page, $0.nextPage, $0.elements) }
+                .map(Pagination.init)
+        }
+
+        loading = action.executing
+        elements = action.elements
+            .scan([]) { elements, pagination in
+                let existingElements = pagination.page == 1 ? [] : elements
+                return existingElements + pagination.elements
+            }
+            .startWith([])
+
+        error = action.errors
+            .flatMap { error -> Observable<Error> in
+                switch error {
+                case .underlyingError(let error):
+                    return Observable.of(error)
+                case .notEnabled:
                     return Observable.empty()
-                } else {
-                    return Observable.of(baseRequest.requestWithPage(1))
                 }
             }
 
-        let nextPageRequest = Observable
-            .combineLatest(loading.asObservable(), hasNextPage.asObservable(), lastLoadedPage.asObservable()) { $0 }
-            .sample(loadNextPageTrigger)
-            .flatMap { loading, hasNextPage, lastLoadedPage -> Observable<Request> in
-                if let page = lastLoadedPage where !loading && hasNextPage {
-                    return Observable.of(baseRequest.requestWithPage(page + 1))
-                } else {
-                    return Observable.empty()
-                }
-            }
-
-        let request = Observable
-            .of(refreshRequest, nextPageRequest)
-            .merge()
-            .shareReplay(1)
-
-        let response = request
-            .flatMap { [weak self] request in
-                return session
-                    .rx_response(request)
-                    .doOnError { [weak self] error in
-                        self?.error.onNext(error)
-                    }
-                    .catchError { _ in Observable.empty() }
-            }
-            .shareReplay(1)
-
-        Observable
-            .of(
-                request.map { _ in true },
-                response.map { _ in false },
-                error.map { _ in false }
-            )
-            .merge()
-            .bindTo(loading)
+        refreshTrigger
+            .map { _ in 1 }
+            .bindTo(action.inputs)
             .addDisposableTo(disposeBag)
 
-        Observable
-            .combineLatest(request, response, elements.asObservable()) { request, response, elements in
-                return request.page == 1 ? response.elements : elements + response.elements
-            }
-            .sample(response)
-            .bindTo(elements)
-            .addDisposableTo(disposeBag)
-
-        response
-            .withLatestFrom(request) { $1.page }
-            .bindTo(lastLoadedPage)
-            .addDisposableTo(disposeBag)
-
-        response
-            .map { $0.hasNextPage }
-            .bindTo(hasNextPage)
+        loadNextPageTrigger
+            .withLatestFrom(action.elements)
+            .flatMap { $0.nextPage.map { Observable.of($0) } ?? Observable.empty() }
+            .bindTo(action.inputs)
             .addDisposableTo(disposeBag)
     }
 }

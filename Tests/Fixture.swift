@@ -11,12 +11,12 @@ import Foundation
 enum Fixture: String {
     case SearchRepositories
 
-    var data: NSData {
-        guard let path = NSBundle(forClass: Dummy.self).pathForResource(self.rawValue, ofType: "json") else {
+    var data: Data {
+        guard let path = Bundle(for: Dummy.self).path(forResource: self.rawValue, ofType: "json") else {
             fatalError("Could not file named \(self.rawValue).json in test bundle.")
         }
 
-        guard let data = NSData(contentsOfFile: path) else {
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)) else {
             fatalError("Could not read data from file at \(path).")
         }
 
