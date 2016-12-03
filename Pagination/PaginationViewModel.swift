@@ -4,13 +4,7 @@ import APIKit
 import Action
 import Himotoki
 
-private struct Pagination<Element: Decodable> {
-    let page: Int
-    let nextPage: Int?
-    let elements: [Element]
-}
-
-final class PaginationViewModel<Element: Decodable> {
+class PaginationViewModel<Element: Decodable> {
     let refreshTrigger = PublishSubject<Void>()
     let loadNextPageTrigger = PublishSubject<Void>()
 
@@ -18,7 +12,7 @@ final class PaginationViewModel<Element: Decodable> {
     let elements: Observable<[Element]>
     let error: Observable<Error>
 
-    private let action: Action<Int, Pagination<Element>>
+    private let action: Action<Int, AnyPaginationResponse<Element>>
     private let disposeBag = DisposeBag()
 
     init<Request: PaginationRequest>(baseRequest: Request, session: Session = Session.shared) where Request.Response.Element == Element {
@@ -26,17 +20,14 @@ final class PaginationViewModel<Element: Decodable> {
             var request = baseRequest
             request.page = page
 
-            return session.rx.response(request)
-                .map { (request.page, $0.nextPage, $0.elements) }
-                .map(Pagination.init)
+            return session.rx
+                .response(request)
+                .map(AnyPaginationResponse.init)
         }
 
         loading = action.executing
         elements = action.elements
-            .scan([]) { elements, pagination in
-                let existingElements = pagination.page == 1 ? [] : elements
-                return existingElements + pagination.elements
-            }
+            .scan([]) { $1.page == 1 ? $1.elements : $0 + $1.elements }
             .startWith([])
 
         error = action.errors
