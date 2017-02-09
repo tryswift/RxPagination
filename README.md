@@ -25,11 +25,15 @@ This demo project illustrates how to use RxSwift, Action and APIKit. The demo ap
 `PaginationViewModel<Element>` is a view model for pagination. It has an initializer with type parameter `Request`, which is constrained to conform to `PaginationRequest` protocol. When `PaginationViewModel<Element>` is instantiated via `init<Request>(baseRequest:)`, the type of its property that represents pagination elements will be inferred as `Observable<[Request.Response.Element]>`.
 
 ```swift
-final class PaginationViewModel<Element: Decodable> {
-    let loading: Observable<Bool>
-    let elements: Observable<[Element]>
+class PaginationViewModel<Element: Decodable> {
+    let indicatorViewAnimating: Driver<Bool>
+    let elements: Driver<[Element]>
+    let loadError: Driver<Error>
 
-    init<Request: PaginationRequest>(baseRequest: Request) where Request.Response.Element == Element {...}
+    init<Request: PaginationRequest>(
+        baseRequest: Request,
+        viewWillAppear: Driver<Void>,
+        scrollViewDidReachBottom: Driver<Void>) where Request.Response.Element == Element {...}
 }
 ```
 
@@ -42,36 +46,27 @@ Once ViewModel is instantiated with a `Request` type parameter, remained task th
 class SearchRepositoriesViewController: UITableViewController {
     @IBOutlet weak var indicatorView: UIActivityIndicatorView!
 
-    let disposeBag = DisposeBag()
-    let viewModel = PaginationViewModel(baseRequest:
-        GitHubAPI.SearchRepositoriesRequest(query: "Swift"))
+    private let disposeBag = DisposeBag()
+    private var viewModel: PaginationViewModel<Repository>!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        rx.sentMessage(#selector(viewWillAppear))
-            .map { _ in }
-            .bindTo(viewModel.refreshTrigger)
-            .addDisposableTo(disposeBag)
+        let baseRequest = GitHubAPI.SearchRepositoriesRequest(query: "Swift")
 
-        tableView.rx.reachedBottom
-            .bindTo(viewModel.loadNextPageTrigger)
-            .addDisposableTo(disposeBag)
+        viewModel = PaginationViewModel(
+            baseRequest: baseRequest,
+            viewWillAppear: rx.viewWillAppear.asDriver(),
+            scrollViewDidReachBottom: tableView.rx.reachedBottom.asDriver())
 
-        viewModel.loading
-            .bindTo(indicatorView.rx.isAnimating)
-            .addDisposableTo(disposeBag)
-
-        viewModel.elements
-            .bindTo(tableView.rx.items(cellIdentifier: "Cell")) { _, repository, cell in
-                cell.textLabel?.text = repository.fullName
-                cell.detailTextLabel?.text = "🌟\(repository.stargazersCount)"
-            }
-            .addDisposableTo(disposeBag)
+        disposeBag.insert([
+            viewModel.indicatorViewAnimating.drive(indicatorView.rx.isAnimating),
+            viewModel.elements.drive(tableView.rx.items(cellIdentifier: "Cell", cellType: RepositoryCell.self)),
+            viewModel.loadError.drive(onNext: { print($0) }),
+        ])
     }
 }
 ```
-
 
 ## Contact
 
