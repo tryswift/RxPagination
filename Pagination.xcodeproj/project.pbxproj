@@ -60,6 +60,9 @@
 		7FE423251C86C09400E6E7EC /* UIScrollView+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE423241C86C09400E6E7EC /* UIScrollView+Rx.swift */; };
 		7FE4232A1C86D4C600E6E7EC /* WebLinking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FE423281C86D4AF00E6E7EC /* WebLinking.framework */; };
 		7FE4232B1C86D4C600E6E7EC /* WebLinking.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7FE423281C86D4AF00E6E7EC /* WebLinking.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7FF3C9AC1E4C8D4E00D95251 /* RepositoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF3C9AB1E4C8D4E00D95251 /* RepositoryCell.swift */; };
+		7FF3C9AE1E4C9EF600D95251 /* UITableView+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF3C9AD1E4C9EF600D95251 /* UITableView+Rx.swift */; };
+		7FF3C9B01E4CA25900D95251 /* DisposeBag+Bulk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF3C9AF1E4CA25900D95251 /* DisposeBag+Bulk.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -144,6 +147,9 @@
 		7FE423201C86BD9C00E6E7EC /* SearchRepositoriesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchRepositoriesViewController.swift; sourceTree = "<group>"; };
 		7FE423241C86C09400E6E7EC /* UIScrollView+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIScrollView+Rx.swift"; sourceTree = "<group>"; };
 		7FE423281C86D4AF00E6E7EC /* WebLinking.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = WebLinking.framework; sourceTree = "<group>"; };
+		7FF3C9AB1E4C8D4E00D95251 /* RepositoryCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepositoryCell.swift; sourceTree = "<group>"; };
+		7FF3C9AD1E4C9EF600D95251 /* UITableView+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UITableView+Rx.swift"; sourceTree = "<group>"; };
+		7FF3C9AF1E4CA25900D95251 /* DisposeBag+Bulk.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DisposeBag+Bulk.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -205,6 +211,7 @@
 			children = (
 				7F9B84021C8688F40076C46A /* AppDelegate.swift */,
 				7FE423201C86BD9C00E6E7EC /* SearchRepositoriesViewController.swift */,
+				7FF3C9AB1E4C8D4E00D95251 /* RepositoryCell.swift */,
 				7FE4231B1C86923B00E6E7EC /* PaginationViewModel.swift */,
 				7FE423141C868CED00E6E7EC /* Request */,
 				7FE41B821C868C1C00E6E7EC /* Response */,
@@ -286,7 +293,9 @@
 			children = (
 				7FE4231D1C8693CF00E6E7EC /* Session+Rx.swift */,
 				7FE423241C86C09400E6E7EC /* UIScrollView+Rx.swift */,
+				7FF3C9AD1E4C9EF600D95251 /* UITableView+Rx.swift */,
 				7F6A1D3C1E4C626200FAA59D /* UIViewController+Rx.swift */,
+				7FF3C9AF1E4CA25900D95251 /* DisposeBag+Bulk.swift */,
 			);
 			name = Extension;
 			sourceTree = "<group>";
@@ -398,6 +407,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7FE423251C86C09400E6E7EC /* UIScrollView+Rx.swift in Sources */,
+				7FF3C9AE1E4C9EF600D95251 /* UITableView+Rx.swift in Sources */,
 				7FE41B7F1C868B7900E6E7EC /* PaginationResponse.swift in Sources */,
 				7FE423161C868D1900E6E7EC /* GitHubRequest.swift in Sources */,
 				7FE4231E1C8693CF00E6E7EC /* Session+Rx.swift in Sources */,
@@ -407,6 +417,8 @@
 				7FE41B7B1C868ADC00E6E7EC /* Repository.swift in Sources */,
 				7FE4231C1C86923B00E6E7EC /* PaginationViewModel.swift in Sources */,
 				7FE423211C86BD9C00E6E7EC /* SearchRepositoriesViewController.swift in Sources */,
+				7FF3C9AC1E4C8D4E00D95251 /* RepositoryCell.swift in Sources */,
+				7FF3C9B01E4CA25900D95251 /* DisposeBag+Bulk.swift in Sources */,
 				7F6A1D3D1E4C626200FAA59D /* UIViewController+Rx.swift in Sources */,
 				7FE423181C8690A900E6E7EC /* GitHubAPI.swift in Sources */,
 			);

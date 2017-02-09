@@ -17,19 +17,10 @@ class SearchRepositoriesViewController: UITableViewController {
             viewWillAppear: rx.viewWillAppear.asDriver(),
             scrollViewDidReachBottom: tableView.rx.reachedBottom.asDriver())
 
-        viewModel.indicatorViewAnimating
-            .drive(indicatorView.rx.isAnimating)
-            .addDisposableTo(disposeBag)
-
-        viewModel.elements
-            .drive(tableView.rx.items(cellIdentifier: "Cell")) { _, repository, cell in
-                cell.textLabel?.text = repository.fullName
-                cell.detailTextLabel?.text = "🌟\(repository.stargazersCount)"
-            }
-            .addDisposableTo(disposeBag)
-
-        viewModel.loadError
-            .drive(onNext: { print($0) })
-            .addDisposableTo(disposeBag)
+        disposeBag.insert([
+            viewModel.indicatorViewAnimating.drive(indicatorView.rx.isAnimating),
+            viewModel.elements.drive(tableView.rx.items(cellIdentifier: "Cell", cellType: RepositoryCell.self)),
+            viewModel.loadError.drive(onNext: { print($0) }),
+        ])
     }
 }
