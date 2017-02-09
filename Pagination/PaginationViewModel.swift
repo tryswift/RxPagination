@@ -1,22 +1,25 @@
 import Foundation
 import RxSwift
+import RxCocoa
 import APIKit
 import Action
 import Himotoki
 
 class PaginationViewModel<Element: Decodable> {
-    let refreshTrigger = PublishSubject<Void>()
-    let loadNextPageTrigger = PublishSubject<Void>()
+    let indicatorViewAnimating: Driver<Bool>
+    let elements: Driver<[Element]>
+    let loadError: Driver<Error>
 
-    let loading: Observable<Bool>
-    let elements: Observable<[Element]>
-    let error: Observable<Error>
-
-    private let action: Action<Int, AnyPaginationResponse<Element>>
+    private let loadAction: Action<Int, AnyPaginationResponse<Element>>
     private let disposeBag = DisposeBag()
 
-    init<Request: PaginationRequest>(baseRequest: Request, session: Session = Session.shared) where Request.Response.Element == Element {
-        action = Action { page in
+    init<Request: PaginationRequest>(
+        baseRequest: Request,
+        session: Session = Session.shared,
+        viewWillAppear: Driver<Void>,
+        scrollViewDidReachBottom: Driver<Void>) where Request.Response.Element == Element {
+
+        loadAction = Action { page in
             var request = baseRequest
             request.page = page
 
@@ -25,30 +28,30 @@ class PaginationViewModel<Element: Decodable> {
                 .map(AnyPaginationResponse.init)
         }
 
-        loading = action.executing
-        elements = action.elements
+        indicatorViewAnimating = loadAction.executing.asDriver(onErrorJustReturn: false)
+        elements = loadAction.elements.asDriver(onErrorDriveWith: .empty())
             .scan([]) { $1.page == 1 ? $1.elements : $0 + $1.elements }
             .startWith([])
 
-        error = action.errors
-            .flatMap { error -> Observable<Error> in
+        loadError = loadAction.errors.asDriver(onErrorDriveWith: .empty())
+            .flatMap { error -> Driver<Error> in
                 switch error {
                 case .underlyingError(let error):
-                    return Observable.of(error)
+                    return Driver.just(error)
                 case .notEnabled:
-                    return Observable.empty()
+                    return Driver.empty()
                 }
             }
 
-        refreshTrigger
+        viewWillAppear.asObservable()
             .map { _ in 1 }
-            .bindTo(action.inputs)
+            .subscribe(loadAction.inputs)
             .addDisposableTo(disposeBag)
 
-        loadNextPageTrigger
-            .withLatestFrom(action.elements)
+        scrollViewDidReachBottom.asObservable()
+            .withLatestFrom(loadAction.elements)
             .flatMap { $0.nextPage.map { Observable.of($0) } ?? Observable.empty() }
-            .bindTo(action.inputs)
+            .subscribe(loadAction.inputs)
             .addDisposableTo(disposeBag)
     }
 }
