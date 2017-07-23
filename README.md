@@ -3,7 +3,7 @@
 This is the demo project for my presentation at try! Swift conference 2016.
 
 - Slides: https://speakerdeck.com/ishkawa/protocol-oriented-programming-in-networking
-- Video: To be uploaded
+- Video: https://news.realm.io/news/tryswift-yosuke-ishikawa-protocol-oriented-networking/
 
 ## Set Up
 
