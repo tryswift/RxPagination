@@ -1,7 +1,7 @@
 import Foundation
 import Himotoki
 
-struct Repository: Decodable {
+struct Repository: Himotoki.Decodable {
     let id: Int
     let fullName: String
     let stargazersCount: Int

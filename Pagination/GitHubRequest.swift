@@ -13,7 +13,7 @@ extension GitHubRequest {
     }
 }
 
-extension GitHubRequest where Response: Decodable {
+extension GitHubRequest where Response: Himotoki.Decodable {
     func response(from object: Any, urlResponse: HTTPURLResponse) throws -> Response {
         return try decodeValue(object)
     }
