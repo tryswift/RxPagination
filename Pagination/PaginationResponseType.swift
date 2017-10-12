@@ -2,14 +2,14 @@ import Foundation
 import Himotoki
 
 protocol PaginationResponse {
-    associatedtype Element: Decodable
+    associatedtype Element: Himotoki.Decodable
     var elements: [Element] { get }
     var page: Int { get }
     var nextPage: Int? { get }
     init(elements: [Element], page: Int, nextPage: Int?)
 }
 
-struct AnyPaginationResponse<Element: Decodable>: PaginationResponse {
+struct AnyPaginationResponse<Element: Himotoki.Decodable>: PaginationResponse {
     let elements: [Element]
     let page: Int
     let nextPage: Int?

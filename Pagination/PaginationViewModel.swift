@@ -5,7 +5,7 @@ import APIKit
 import Action
 import Himotoki
 
-class PaginationViewModel<Element: Decodable> {
+class PaginationViewModel<Element: Himotoki.Decodable> {
     let indicatorViewAnimating: Driver<Bool>
     let elements: Driver<[Element]>
     let loadError: Driver<Error>
